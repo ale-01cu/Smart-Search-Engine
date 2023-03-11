@@ -1,10 +1,8 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import ContenidoView
+from .views import ContenidoView, BusquedaView
 
 router = DefaultRouter()
 router.register('', ContenidoView, basename='contenido')
 
-urlpatterns = [
-  path('', include(router.urls))
-]
+urlpatterns = router.urls
