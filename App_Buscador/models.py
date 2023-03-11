@@ -3,7 +3,13 @@ import json
 
 # Create your models here.
 class Contenido(models.Model):
-  categoria = models.CharField(max_length=200)
+  choices = [
+    ('Pelicula', 'Pelicula'),
+    ('Serie', 'Serie'),
+    ('Novela', 'Novela')
+  ]
+  
+  categoria = models.CharField(max_length=50, choices=choices)
   titulo = models.CharField(max_length=200)
   fecha_de_estreno = models.DateField()
   descripcion = models.TextField()
