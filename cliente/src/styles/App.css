@@ -1,0 +1,66 @@
+
+.App-header {
+  display: flex;
+  width: 100%;
+  height: 150px;
+  justify-content: center;
+  align-items: center;
+}
+
+.App-header form{
+  width: 50%;
+}
+
+.container-input-search{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid #ababab;
+  width: 100%;
+  padding: 2px;
+  border-radius: 10px;
+}
+
+.container-input-search button{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5px;
+  border: none;
+  cursor: pointer;
+  padding-right: 0;
+}
+
+.container-input-search input{
+  padding: 9px;
+  border: none;
+  outline: none;
+  width: 100%;
+}
+
+.container-input-search{
+  box-shadow: 2px 3px 5px 0 #aaabbb;
+}
+
+.grilla{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-gap: 10px;
+  padding: 20px;
+}
+
+.card{
+  border: 1px solid #ababab;
+  padding: 20px ;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  color: gray;
+  color: black;
+  font-size: larger;
+}
+
+.card:hover{
+  background-color: #dddddd;
+}
