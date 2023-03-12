@@ -15,6 +15,8 @@ class ContenidoView(viewsets.ViewSet):
   
   def retrieve(self, request, pk=None):
     try:
+      print(pk)
+      print("entre a detalle")
       querySet = Contenido.objects.get(id=pk)
       data = SerializerContenido(querySet)
       return Response(data.data)

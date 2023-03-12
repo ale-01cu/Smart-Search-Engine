@@ -44,7 +44,7 @@
 
 .grilla{
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(258px, 1fr));
   grid-gap: 10px;
   padding: 20px;
 }
@@ -53,14 +53,22 @@
   border: 1px solid #ababab;
   padding: 20px ;
   display: flex;
-  justify-content: center;
+  justify-content: start;
   align-items: center;
   text-decoration: none;
-  color: gray;
   color: black;
   font-size: larger;
+  flex-direction: column;
 }
 
 .card:hover{
   background-color: #dddddd;
+}
+
+.detalle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border: 2px solid #212121;
 }
