@@ -56,7 +56,7 @@ class BusquedaView(viewsets.ViewSet):
     print(resultado)
     respuesta = []
     for k in resultado: 
-      if k['datos']['total'] == valor_max:
+      if valor_max != 0 and k['datos']['total'] == valor_max:
         respuesta.append(k['e'])
       
     

@@ -71,3 +71,17 @@
   flex-direction: column;
   border: 2px solid #212121;
 }
+
+.btn-inicio{
+  text-decoration: none;
+  color: black;
+  margin-right: 10px;
+  background-color: #dddddd;
+  padding: 10px;
+  transition: all 0.3s;
+  border-radius: 10px;
+}
+
+.btn-inicio:hover{
+  background-color: #bbbbbb;
+}

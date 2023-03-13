@@ -1,5 +1,5 @@
 import './styles/App.css';
-import { Route, Switch } from 'wouter'
+import { Link, Route, Switch } from 'wouter'
 import { ListCards } from './components/ListCards'
 import { DetailCard } from './components/DetailCard'
 import {Buscador} from './components/Buscador'
@@ -14,7 +14,9 @@ function App() {
 
   return (
     <div className="App">
+
       <header className="App-header">
+        <Link to='http://localhost:8000' className='btn-inicio'>Inicio</Link>
         <Buscador actualizarUrl valueInput={buscador}/>
       </header>
 
