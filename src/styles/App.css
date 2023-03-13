@@ -54,10 +54,9 @@
   padding: 20px ;
   display: flex;
   justify-content: start;
-  align-items: center;
+  align-items: start;
   text-decoration: none;
   color: black;
-  font-size: larger;
   flex-direction: column;
 }
 
