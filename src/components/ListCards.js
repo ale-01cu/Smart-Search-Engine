@@ -1,7 +1,8 @@
 import {useEffect, useState} from 'react'
 import { Link } from 'wouter';
 import { fetching } from '../services/Fetching'
-const URL_DETALLE = 'detalle/'
+
+const URL_DETALLE = '/detalle/'
 
 export const ListCards = ({url}) => {
   const [cards, setCards] = useState([]);
@@ -10,8 +11,6 @@ export const ListCards = ({url}) => {
     fetching(url).then(res => {
       setCards(res)
     })
-    
-
   }, [url]);
 
   return (

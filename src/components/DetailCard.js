@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { fetching } from '../services/Fetching'
 
-export const DetailCard = ({params}) => {
-  const URL_DETAIL = 'http://localhost:8000/api/contenido/' + params.id + "/" 
+export const DetailCard = ({id}) => {
+  const URL_DETAIL = 'http://localhost:8000/api/contenido/' + id + "/" 
   const [detail, setDetail] = useState({})
 
   useEffect(() => {
@@ -10,9 +10,6 @@ export const DetailCard = ({params}) => {
     
   }, [URL_DETAIL])
 
-  console.log(URL_DETAIL);
-  console.log(detail);
-  
   return (
     <div className='detalle'>
       <h1>{detail.titulo}</h1>
