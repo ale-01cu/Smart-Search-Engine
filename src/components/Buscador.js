@@ -6,7 +6,8 @@ export const Buscador = ({valueInput}) => {
   const [location , setLocation] = useLocation()
 
   useEffect(() => {
-    setBuscador(valueInput)
+    const inpputFiltrado = valueInput.replaceAll("%20", " ")
+    setBuscador(inpputFiltrado)
   }, [valueInput])
 
   const handleSubmit = evnt => {

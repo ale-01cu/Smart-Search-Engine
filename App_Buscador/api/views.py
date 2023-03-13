@@ -30,14 +30,35 @@ class BusquedaView(viewsets.ViewSet):
     querySets = Contenido.objects.all()
     serializer = SerializerContenido(querySets, many=True)
     
-    print(query_busqueda)
-    
+    palabras_claves = query_busqueda.split(" ")
+    resultado = []
+    valor_max = 0
+    palabras_y_coincidencias = []
+    promedio = 0
+      
     # Imprimir contenido del serializer en formato JSON
     for i in serializer.data:
       id, categoria, titulo, descripcion, fecha, generos = i.values()
       todo = f"{categoria} {titulo} {descripcion} {fecha} {generos}"
-      print(todo)
+      
+      
+      for j in palabras_claves:
+        repeticiones = todo.count(j)
+        palabras_y_coincidencias.append({j: repeticiones})
+        promedio += repeticiones
+        
+      
+      if valor_max < promedio: valor_max = promedio
+      resultado.append({'e': i, 'datos': {'coincidencias': palabras_y_coincidencias, 'total': promedio}})
+      palabras_y_coincidencias = []
+      promedio = 0
+    
+    print(resultado)
+    respuesta = []
+    for k in resultado: 
+      if k['datos']['total'] == valor_max:
+        respuesta.append(k['e'])
       
     
-    return Response(serializer.data)
+    return Response(respuesta)
     
