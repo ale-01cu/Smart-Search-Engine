@@ -1,5 +1,5 @@
 """
-WSGI config for Proyecto_Buscador_Inteligente project.
+WSGI config for Proyecto_BuscadorInteligente project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Proyecto_Buscador_Inteligente.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Proyecto_BuscadorInteligente.settings')
 
 application = get_wsgi_application()

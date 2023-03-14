@@ -4,11 +4,12 @@ from App_Buscador.models import Contenido
 from .serializers import SerializerContenido
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-import json
+from rest_framework.views import APIView
 
 # Create your views here.
 class ContenidoView(viewsets.ViewSet):
   def list(self, request):
+    print("todo el contenido")
     querySets = Contenido.objects.all()
     serializer = SerializerContenido(querySets, many=True)
     return Response(serializer.data)
@@ -26,6 +27,8 @@ class ContenidoView(viewsets.ViewSet):
 
 class BusquedaView(viewsets.ViewSet):
   def list(self, request):
+    print("en la busqueda")
+    
     query_busqueda = request.query_params.get('busqueda', None)
     querySets = Contenido.objects.all()
     serializer = SerializerContenido(querySets, many=True)
@@ -53,12 +56,12 @@ class BusquedaView(viewsets.ViewSet):
       palabras_y_coincidencias = []
       promedio = 0
     
-    print(resultado)
     respuesta = []
     for k in resultado: 
       if valor_max != 0 and k['datos']['total'] == valor_max:
         respuesta.append(k['e'])
       
+    print(respuesta)
     
-    return Response(respuesta)
+    return Response(respuesta, status=status.HTTP_200_OK)
     

@@ -1,14 +1,14 @@
 
-export const fetching = props => {
-
-return fetch(props)
-  .then(res => res.json())
-  .then(data => {
+export const fetching = async (props) => {
+  try {
+    const res = await fetch(props)
+    const data = await res.json()
     console.log(data);
     return data
-  })
-  .catch(err => {
-    console.log(err);
-  })
+    
+  } catch (error) {
+    
+    console.log(error);
+  }
 
 }

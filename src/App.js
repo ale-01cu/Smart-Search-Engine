@@ -1,8 +1,6 @@
-import './styles/App.css';
-import { Link, Route, Switch } from 'wouter'
-import { ListCards } from './components/ListCards'
-import { DetailCard } from './components/DetailCard'
-import {Buscador} from './components/Buscador'
+import './styles/index.css'
+import {Header} from './components/header'
+import {Main} from './components/main'
 import { useState } from 'react';
 
 const URL_CONTENIDO = 'http://localhost:8000/api/contenido'
@@ -13,31 +11,11 @@ function App() {
   const [buscador, setBuscador] = useState("")
 
   return (
-    <div className="App">
-
-      <header className="App-header">
-        <Link to='http://localhost:8000' className='btn-inicio'>Inicio</Link>
-        <Buscador actualizarUrl valueInput={buscador}/>
-      </header>
-
-      <main>
-        <Switch>
-          <Route path='/'><ListCards url={URL_CONTENIDO}/></Route>
-          <Route path='/detalle/:id'>
-            {params => <DetailCard id={params.id}/>}
-          </Route>
-          <Route path='/result/:busqueda'>
-            {params => {
-              setBuscador(params.busqueda)
-              return <ListCards url={URL_BUSQUEDA + params.busqueda}/>
-            }}
-          </Route>
-        </Switch>
-      </main>
-
-
+    <div>
+      <Header buscador={buscador}/>
+      <Main setBuscador={setBuscador} URL_BUSQUEDA={URL_BUSQUEDA} URL_CONTENIDO={URL_CONTENIDO}/>
     </div>
-  );
+    );
 }
 
 export default App;
