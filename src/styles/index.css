@@ -33,6 +33,11 @@ code {
   width: 100%;
   padding: 2px;
   border-radius: 10px;
+  transition: all 0.3s;
+}
+
+.container-input-search:hover{
+  box-shadow: 2px 3px 5px 0 #aaabbb;
 }
 
 .container-input-search button{
@@ -52,9 +57,6 @@ code {
   width: 100%;
 }
 
-.container-input-search{
-  box-shadow: 2px 3px 5px 0 #aaabbb;
-}
 
 .grilla{
   display: grid;
@@ -102,4 +104,9 @@ code {
 
 .btn-buscar{
   background-color: white;
+}
+
+.container-not-found{
+  text-align: center;
+  color: red;
 }
