@@ -99,3 +99,7 @@ code {
 .btn-inicio:hover{
   background-color: #bbbbbb;
 }
+
+.btn-buscar{
+  background-color: white;
+}

@@ -3,8 +3,8 @@ import {Header} from './components/header'
 import {Main} from './components/main'
 import { useState } from 'react';
 
-const URL_CONTENIDO = 'http://localhost:8000/api/contenido'
-const URL_BUSQUEDA = `http://localhost:8000/api/contenido/resultadoBusqueda/?busqueda=`
+const URL_CONTENIDO = 'http://localhost:8000/api/contenido/'
+const URL_BUSQUEDA = `http://localhost:8000/api/search/?busqueda=`
 
 
 function App() {
