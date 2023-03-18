@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from App_Buscador.helpers.ordenamiento_Quicksort import Quicksort, burbuja
-from App_Buscador.helpers.palabras_para_excluir import palabras
+from App_Buscador.helpers.procesar_texto import procesar
 import spacy
 from rank_bm25 import BM25Okapi
 from tqdm import tqdm
@@ -37,13 +37,26 @@ class ContenidoView(viewsets.ModelViewSet):
 
 #   def create(self)
 
+from txtai.embeddings import Embeddings
 
-class BusquedaView(viewsets.ViewSet):
-    def list(self, request, busqueda):
-        # Carga el modelo de lenguaje en Spacy
-        nlp = spacy.load('es_core_news_sm')
+# class BusquedaView(viewsets.ViewSet):
+#     def list(self, request, busqueda):
+#         nlp = spacy.load("es_core_news_md")
 
-        return Response({"a": "hola buenos dias"})
+#         entrada = "pelicula donde se maten a muchas personas y hayan carros voladores que hablen entre ellos y conspiren en contra de una revolucion diabolica del 1980"
+#         doc = nlp(entrada)
+            
+#         # Saca palabras que no interesan
+#         palabras_no_vacias = [token.text for token in doc if not token.is_stop]
+        
+#         # forma base 
+#         document = nlp(" ".join(palabras_no_vacias))
+#         forma_base = [token.lemma_ for token in document]
+#         print(forma_base)
+
+
+
+#         return Response({"a": "hola buenos dias"})
 
 
 # class BusquedaView(viewsets.ViewSet):
@@ -86,44 +99,38 @@ class BusquedaView(viewsets.ViewSet):
 
 
 
-# class BusquedaView(viewsets.ViewSet):
-#   def list(self, request, busqueda):
-#     print("en la busqueda")
-#     print(busqueda)
+class BusquedaView(viewsets.ViewSet):
+  def list(self, request, busqueda):
+  
+    query_busqueda = request.query_params.get('busqueda', None).lower()
+    palabras_claves = procesar(texto=query_busqueda)
     
-#     query_busqueda = request.query_params.get('busqueda', None).lower()
-#     querySets = Contenido.objects.all()
-#     serializer = SerializerContenido(querySets, many=True)
-    
-#     palabras_claves = query_busqueda.split(" ")
-#     resultado = []
-#     valor_max = 0
-#     palabras_y_coincidencias = []
-#     promedio = 0
-      
-#     # Imprimir contenido del serializer en formato JSON
-#     for i in serializer.data:
-#       id, categoria, titulo, descripcion, fecha, generos = i.values()
-#       todo = f"{categoria}s {titulo} {descripcion} {fecha} {generos}".lower()
-      
-      
-#       for j in palabras_claves:
-#         if not (j in palabras):
-#           repeticiones = todo.count(j)
-#           promedio += repeticiones
-#           palabras_y_coincidencias.append({j: repeticiones})
+    querySets = Contenido.objects.all()
+    serializer = SerializerContenido(querySets, many=True)
 
-#         else:
-#           print(f"la palabra '{j}' esta en la lista de palabras para excliuir...")
-          
+    resultado = []
+    valor_max = 0
+    promedio = 0
       
-#       if valor_max < promedio: valor_max = promedio
-#       if promedio > 0:
-#         resultado.append({'e': i, 'datos': {'coincidencias': palabras_y_coincidencias, 'total': promedio}})
-#       palabras_y_coincidencias = []
-#       promedio = 0
+    # Imprimir contenido del serializer en formato JSON
+    for i in serializer.data:
+      id, categoria, titulo, descripcion, fecha, generos = i.values()
+      todo = f"{categoria}s {titulo} {descripcion} {fecha} {generos}".lower()
+      todo_procesado = procesar(texto=todo)
+      
+      print("relacion")
+      print(palabras_claves)
+      print(todo_procesado)
+      
+      for j in palabras_claves:
+        if j in todo_procesado:
+          promedio += 1
+        
+      if valor_max < promedio: valor_max = promedio
+      if promedio > 0 and promedio >= len(palabras_claves):
+        resultado.append({'e': i, 'coincidencias': promedio})
+      promedio = 0
 
-#     burbuja(resultado)
-#     respuesta = list(map(lambda x: x['e'], resultado))
+    respuesta = list(map(lambda x: x['e'], resultado))
 
-#     return Response(respuesta, status=status.HTTP_200_OK)
+    return Response(respuesta, status=status.HTTP_200_OK)

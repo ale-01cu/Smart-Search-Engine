@@ -19,6 +19,7 @@ code {
   height: 150px;
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .App-header form{
@@ -33,7 +34,11 @@ code {
   width: 100%;
   padding: 2px;
   border-radius: 10px;
-  transition: all 0.3s;
+  transition: all 0.2s;
+}
+
+.container-input-search.focus{
+  box-shadow: 2px 3px 5px 0 #aaabbb;
 }
 
 .container-input-search:hover{
