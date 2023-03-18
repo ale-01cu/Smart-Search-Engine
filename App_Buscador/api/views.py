@@ -7,9 +7,6 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from App_Buscador.helpers.ordenamiento_Quicksort import Quicksort, burbuja
 from App_Buscador.helpers.procesar_texto import procesar
-import spacy
-from rank_bm25 import BM25Okapi
-from tqdm import tqdm
 
 # Create your views here.
 # 
@@ -36,8 +33,6 @@ class ContenidoView(viewsets.ModelViewSet):
 #       return Response({'msg':'Ha ocurrido un error al buscar ese id en la DB'}, status=status.HTTP_404_NOT_FOUND)
 
 #   def create(self)
-
-from txtai.embeddings import Embeddings
 
 # class BusquedaView(viewsets.ViewSet):
 #     def list(self, request, busqueda):
@@ -117,10 +112,6 @@ class BusquedaView(viewsets.ViewSet):
       id, categoria, titulo, descripcion, fecha, generos = i.values()
       todo = f"{categoria}s {titulo} {descripcion} {fecha} {generos}".lower()
       todo_procesado = procesar(texto=todo)
-      
-      print("relacion")
-      print(palabras_claves)
-      print(todo_procesado)
       
       for j in palabras_claves:
         if j in todo_procesado:

@@ -9,7 +9,10 @@ export const Main = ({setBuscador, URL_BUSQUEDA, URL_CONTENIDO}) => {
     <main>
         <Switch>
           <Route path='/'>
-            {params => <ListCards url={URL_CONTENIDO}/>}
+            {params => {
+              setBuscador("")
+              return <ListCards url={URL_CONTENIDO}/>
+            }}
           </Route>
 
           <Route path='/detalle/:id'>

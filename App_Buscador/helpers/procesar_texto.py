@@ -1,26 +1,28 @@
-import spacy
+import nltk
+#nltk.download('stopwords')
+#nltk.download('punkt')
+#nltk.download('wordnet')
 
-nlp = spacy.load("es_core_news_md")
+
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.stem import PorterStemmer
 
 def procesar(**keyargs):
-    doc = nlp(keyargs['texto'])
-    lemma = [token.lemma_ for token in doc]
-    print(lemma)
-    
-    palabras_no_vacias = [token.text for token in nlp(" ".join(lemma)) if not token.is_stop]
-    palabras_con_peso = [token.text for token in nlp(" ".join(lemma)) if token.pos_.startswith(("NOUN", "VERB", "ADJ"))]
-    datos = palabras_con_peso + palabras_no_vacias
-    fin = list(set(datos))
-    mensaje = f"*****titulo*****\n{keyargs['texto']}\n{fin}"
-    print(mensaje)
-    return fin
+  texto = keyargs['texto']
   
-def prueba():
-  doc = ["peliculas", "peliculas"]
-  doc2 = ["de", "de"]
-  doc3 = ["mierda"]
+  stop_words = set(stopwords.words('spanish'))
+
+  # Tokenizar la frase
+  words = word_tokenize(texto)
+  stemmer = PorterStemmer()
+
+  # Eliminar las palabras vacías
+  filtered_words = [word for word in words if word.casefold() not in stop_words]
+  stemmed_words = [stemmer.stem(word) for word in filtered_words]
   
-  fin = [token.lemma_ for token in nlp(" ".join(list(doc) + list(doc2) + list(doc3)))]
-  print(fin)
-  
-prueba()
+  mensaje = f'Comparacion:\n original: {texto} \n modificado: {stemmed_words}'
+  print(mensaje)
+
+  return stemmed_words
+
