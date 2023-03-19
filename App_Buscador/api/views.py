@@ -1,12 +1,10 @@
-from django.shortcuts import render
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, generics, filters
 from App_Buscador.models import Contenido
 from .serializers import SerializerContenido
 from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
-from rest_framework.views import APIView
 from App_Buscador.helpers.ordenamiento_Quicksort import Quicksort, burbuja
-from App_Buscador.helpers.procesar_texto import procesar
+from App_Buscador.helpers.procesar_texto import search
+import time
 
 # Create your views here.
 # 
@@ -14,50 +12,14 @@ from App_Buscador.helpers.procesar_texto import procesar
 class ContenidoView(viewsets.ModelViewSet):
     queryset = Contenido.objects.all()
     serializer_class = SerializerContenido
-# 
-# class ContenidoView(viewsets.ViewSet):
-#   def list(self, request):
-#     print("todo el contenido")
-#     querySets = Contenido.objects.all()
-#     serializer = SerializerContenido(querySets, many=True)
-#     return Response(serializer.data)
-  
-#   def retrieve(self, request, pk=None):
-#     try:
-#       print(pk)
-#       print("entre a detalle")
-#       querySet = Contenido.objects.get(id=pk)
-#       data = SerializerContenido(querySet)
-#       return Response(data.data)
-#     except:
-#       return Response({'msg':'Ha ocurrido un error al buscar ese id en la DB'}, status=status.HTTP_404_NOT_FOUND)
 
-#   def create(self)
-
-# class BusquedaView(viewsets.ViewSet):
-#     def list(self, request, busqueda):
-#         nlp = spacy.load("es_core_news_md")
-
-#         entrada = "pelicula donde se maten a muchas personas y hayan carros voladores que hablen entre ellos y conspiren en contra de una revolucion diabolica del 1980"
-#         doc = nlp(entrada)
-            
-#         # Saca palabras que no interesan
-#         palabras_no_vacias = [token.text for token in doc if not token.is_stop]
-        
-#         # forma base 
-#         document = nlp(" ".join(palabras_no_vacias))
-#         forma_base = [token.lemma_ for token in document]
-#         print(forma_base)
-
-
-
-#         return Response({"a": "hola buenos dias"})
-
-
+# import operator
+# from functools import reduce
+# from django.db.models import Q, Sum, Case, When, IntegerField
 # class BusquedaView(viewsets.ViewSet):
 #   def list(self, request, busqueda):
 #     query_busqueda = request.query_params.get('busqueda', '').lower()
-#     palabras_claves = query_busqueda.split()
+#     palabras_claves = query_busqueda.split(" ")
     
 #     if not palabras_claves:
 #         # Si no hay palabras clave, devolver todos los contenidos
@@ -68,7 +30,7 @@ class ContenidoView(viewsets.ModelViewSet):
 #             reduce(operator.and_, (Q(categoria__icontains=palabra) | 
 #                                     Q(titulo__icontains=palabra) | 
 #                                     Q(descripcion__icontains=palabra) | 
-#                                     Q(fecha__icontains=palabra) | 
+#                                     Q(fecha_de_estreno__icontains=palabra) | 
 #                                     Q(generos__icontains=palabra) 
 #                                     for palabra in palabras_claves))
 #         )
@@ -80,7 +42,7 @@ class ContenidoView(viewsets.ModelViewSet):
 #                 reduce(operator.and_, (Q(categoria__icontains=palabra) | 
 #                                         Q(titulo__icontains=palabra) | 
 #                                         Q(descripcion__icontains=palabra) | 
-#                                         Q(fecha__icontains=palabra) | 
+#                                         Q(fecha_de_estreno__icontains=palabra) | 
 #                                         Q(generos__icontains=palabra) 
 #                                         for palabra in palabras_claves)), 
 #                 then=1), 
@@ -91,37 +53,30 @@ class ContenidoView(viewsets.ModelViewSet):
 #     # Serializar los resultados y devolverlos
 #     serializer = SerializerContenido(queryset, many=True)
 #     return Response(serializer.data, status=status.HTTP_200_OK)
-
-
+    
 
 class BusquedaView(viewsets.ViewSet):
   def list(self, request, busqueda):
   
+    start_time = time.time()
     query_busqueda = request.query_params.get('busqueda', None).lower()
-    palabras_claves = procesar(texto=query_busqueda)
-    
+
     querySets = Contenido.objects.all()
     serializer = SerializerContenido(querySets, many=True)
 
     resultado = []
-    valor_max = 0
-    promedio = 0
-      
+          
     # Imprimir contenido del serializer en formato JSON
     for i in serializer.data:
-      id, categoria, titulo, descripcion, fecha, generos = i.values()
-      todo = f"{categoria}s {titulo} {descripcion} {fecha} {generos}".lower()
-      todo_procesado = procesar(texto=todo)
+      todo = f"{i['categoria']}s {i['titulo']} {i['descripcion']} {i['fecha_de_estreno']} {i['generos']}".lower()
+      coincidencias = search(query_busqueda, todo)
+      if coincidencias > 0: resultado.append({"e": i, "c":coincidencias})
       
-      for j in palabras_claves:
-        if j in todo_procesado:
-          promedio += 1
-        
-      if valor_max < promedio: valor_max = promedio
-      if promedio > 0 and promedio >= len(palabras_claves):
-        resultado.append({'e': i, 'coincidencias': promedio})
-      promedio = 0
-
-    respuesta = list(map(lambda x: x['e'], resultado))
-
+    ordenados = sorted(resultado, key=lambda x: x['c'], reverse=True)
+    respuesta = [e['e'] for e in ordenados]
+    
+    end_time = time.time()
+    tiempo_total = round(end_time - start_time, 4)
+    print(f"La busqueda tardo {tiempo_total} segundos en ejecutarse")
+    
     return Response(respuesta, status=status.HTTP_200_OK)

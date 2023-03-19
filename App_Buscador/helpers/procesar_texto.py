@@ -7,6 +7,7 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import PorterStemmer
+from collections import Counter
 
 def procesar(**keyargs):
   texto = keyargs['texto']
@@ -18,11 +19,27 @@ def procesar(**keyargs):
   stemmer = PorterStemmer()
 
   # Eliminar las palabras vacías
-  filtered_words = [word for word in words if word.casefold() not in stop_words]
+  filtered_words = [token for token in words if token.isalpha() and token not in stop_words]
   stemmed_words = [stemmer.stem(word) for word in filtered_words]
+  palabras_Claves_sin_repetirse = list(Counter(stemmed_words).keys())
   
-  mensaje = f'Comparacion:\n original: {texto} \n modificado: {stemmed_words}'
-  print(mensaje)
+  return palabras_Claves_sin_repetirse
 
-  return stemmed_words
+
+def search(query, document):
+  query_procesada = procesar(texto=query)
+  document_procesado = procesar(texto=document)
+  doc_text = " ".join(document_procesado)
+  
+  coincidencias = 0
+  similitud = 0
+
+  for querys in query_procesada:
+    coincidencias += doc_text.count(querys)
+  
+  
+  mensaje = f'Comparacion:\n query: {query_procesada} \n doc: {document_procesado}'
+  print(mensaje)
+  
+  return coincidencias
 
