@@ -1,7 +1,7 @@
 import nltk
-#nltk.download('stopwords')
-#nltk.download('punkt')
-#nltk.download('wordnet')
+nltk.download('stopwords')
+nltk.download('punkt')
+nltk.download('wordnet')
 
 
 from nltk.corpus import stopwords
@@ -36,7 +36,6 @@ def search(query, document):
 
   for querys in query_procesada:
     coincidencias += doc_text.count(querys)
-  
   
   mensaje = f'Comparacion:\n query: {query_procesada} \n doc: {document_procesado}'
   print(mensaje)
