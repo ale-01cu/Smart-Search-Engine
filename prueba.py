@@ -198,144 +198,158 @@
 #     palabras_Claves_sin_repetirse = list(Counter(stemmed_words).keys())
 
 #     return palabras_Claves
-from nltk.corpus import stopwords # importa el conjunto de palabras vacías de NLTK
-from nltk.tokenize import word_tokenize # importa el tokenizador de palabras de NLTK
-from nltk.stem import SnowballStemmer # importa el stemmer de nieve de NLTK
-from collections import Counter # importa la clase Counter para contar elementos
-from nltk import NaiveBayesClassifier, classify # importa el clasificador Naive Bayes de NLTK y la función classify
-import math # importa el módulo de matemáticas de Python
-from operator import itemgetter # importa la función itemgetter del módulo operator
+# from nltk.corpus import stopwords # importa el conjunto de palabras vacías de NLTK
+# from nltk.tokenize import word_tokenize # importa el tokenizador de palabras de NLTK
+# from nltk.stem import SnowballStemmer # importa el stemmer de nieve de NLTK
+# from collections import Counter # importa la clase Counter para contar elementos
+# from nltk import NaiveBayesClassifier, classify # importa el clasificador Naive Bayes de NLTK y la función classify
+# import math # importa el módulo de matemáticas de Python
+# from operator import itemgetter # importa la función itemgetter del módulo operator
 
-# crea una instancia de SnowballStemmer para español
-stemmer = SnowballStemmer('spanish')
+# # crea una instancia de SnowballStemmer para español
+# stemmer = SnowballStemmer('spanish')
 
-# obtiene el conjunto de palabras vacías de español de NLTK
-stop_words = set(stopwords.words('spanish'))
+# # obtiene el conjunto de palabras vacías de español de NLTK
+# stop_words = set(stopwords.words('spanish'))
 
-# lista de documentos de ejemplo
-docs = [
-  "Documento de prueba para saber la fiabilidad de machine learning",
-  "Documento relacionado con peliculas de todo tipo en cualquier contexto",
-  "Esto no es un documento sino un manifiesto hacerca de series de todo tipo",
-  "Esto es un documento de prueba para un motor de busqueda utilizando machine learning"
-]
+# # lista de documentos de ejemplo
+# docs = [
+#   "Documento de prueba para saber la fiabilidad de machine learning",
+#   "Documento relacionado con peliculas de todo tipo en cualquier contexto",
+#   "Esto no es un documento sino un manifiesto hacerca de series de todo tipo",
+#   "Esto es un documento de prueba para un motor de busqueda utilizando machine learning"
+# ]
 
-# función para procesar un texto
-def process(entrada):
-    # tokeniza la entrada
-    tokens = word_tokenize(entrada)
-    # aplica el stemmer a cada token y lo agrega a una lista si cumple con ciertos criterios
-    tokens_limpios = [stemmer.stem(token.lower()) for token in tokens if token.isalpha() and token not in stop_words]
-    # cuenta la cantidad de veces que aparece cada token y los devuelve en un diccionario
-    counter = Counter(tokens_limpios)
-    return dict(counter)
+# # función para procesar un texto
+# def process(entrada):
+#     # tokeniza la entrada
+#     tokens = word_tokenize(entrada)
+#     # aplica el stemmer a cada token y lo agrega a una lista si cumple con ciertos criterios
+#     tokens_limpios = [stemmer.stem(token.lower()) for token in tokens if token.isalpha() and token not in stop_words]
+#     # cuenta la cantidad de veces que aparece cada token y los devuelve en un diccionario
+#     counter = Counter(tokens_limpios)
+#     return dict(counter)
   
-# función para calcular los IDFs de los términos
-def calculate_idfs(vocabulary, doc_features):
-  # crea un diccionario vacío para almacenar los IDFs
-  doc_idfs = {}
-  # itera por cada término del vocabulario
-  for term in vocabulary:
-    doc_count = 0
-    # itera por cada documento en el conjunto de documentos
-    for doc_id in doc_features.keys():
-      # obtiene los términos del documento actual
-      terms = doc_features.get(doc_id)
-      # si el término actual aparece en el documento actual, aumenta el contador
-      if term in terms.keys():
-        doc_count += 1
-    # calcula el IDF del término actual y lo almacena en el diccionario de IDFs
-    doc_idfs[term] = math.log(
-      float(len(doc_features.keys()))/
-      float(1 + doc_count), 10)
-  # devuelve el diccionario de IDFs
-  return doc_idfs
+# # función para calcular los IDFs de los términos
+# def calculate_idfs(vocabulary, doc_features):
+#   # crea un diccionario vacío para almacenar los IDFs
+#   doc_idfs = {}
+#   # itera por cada término del vocabulario
+#   for term in vocabulary:
+#     doc_count = 0
+#     # itera por cada documento en el conjunto de documentos
+#     for doc_id in doc_features.keys():
+#       # obtiene los términos del documento actual
+#       terms = doc_features.get(doc_id)
+#       # si el término actual aparece en el documento actual, aumenta el contador
+#       if term in terms.keys():
+#         doc_count += 1
+#     # calcula el IDF del término actual y lo almacena en el diccionario de IDFs
+#     doc_idfs[term] = math.log(
+#       float(len(doc_features.keys()))/
+#       float(1 + doc_count), 10)
+#   # devuelve el diccionario de IDFs
+#   return doc_idfs
 
-def vectorize_idf(input_terms, input_idfs, vocabulary):
-  # Crea un diccionario vacío para almacenar los vectores de salida
-  output = {}
+# def vectorize_idf(input_terms, input_idfs, vocabulary):
+#   # Crea un diccionario vacío para almacenar los vectores de salida
+#   output = {}
   
-  # Itera sobre los términos de entrada para cada documento
-  for item_id in input_terms.keys():
-    terms = input_terms.get(item_id)
-    output_vector = []
+#   # Itera sobre los términos de entrada para cada documento
+#   for item_id in input_terms.keys():
+#     terms = input_terms.get(item_id)
+#     output_vector = []
     
-    # Itera sobre todo el vocabulario
-    for term in vocabulary:
-      # Si el término actual está presente en el documento actual, calcula su puntuación IDF y multiplica por la frecuencia del término en el documento
-      if term in terms.keys():
-        output_vector.append(input_idfs.get(term)*float(terms.get(term)))
-      # Si el término actual no está presente en el documento actual, su puntuación IDF es 0 y su frecuencia es 0
-      else:
-        output_vector.append(float(0))
+#     # Itera sobre todo el vocabulario
+#     for term in vocabulary:
+#       # Si el término actual está presente en el documento actual, calcula su puntuación IDF y multiplica por la frecuencia del término en el documento
+#       if term in terms.keys():
+#         output_vector.append(input_idfs.get(term)*float(terms.get(term)))
+#       # Si el término actual no está presente en el documento actual, su puntuación IDF es 0 y su frecuencia es 0
+#       else:
+#         output_vector.append(float(0))
     
-    # Añade el vector de salida para el documento actual al diccionario de salida
-    output[item_id] = output_vector
+#     # Añade el vector de salida para el documento actual al diccionario de salida
+#     output[item_id] = output_vector
     
-  # Devuelve el diccionario de vectores de salida
-  return output
+#   # Devuelve el diccionario de vectores de salida
+#   return output
 
 
-def length(vector):
-  # Calcula la longitud del vector utilizando la fórmula euclidiana
-  sq_length = 0
-  for index in range(0, len(vector)):
-    sq_length += math.pow(vector[index], 2)
-  return math.sqrt(sq_length)
+# def length(vector):
+#   # Calcula la longitud del vector utilizando la fórmula euclidiana
+#   sq_length = 0
+#   for index in range(0, len(vector)):
+#     sq_length += math.pow(vector[index], 2)
+#   return math.sqrt(sq_length)
 
 
-def dot_product(vector1, vector2):
-  # Calcula el producto punto de dos vectores, solo si tienen la misma longitud
-  if len(vector1) == len(vector2):
-    dot_prod = 0
-    for index in range(0, len(vector1)):
-      # Ignora los valores de 0 en ambos vectores, ya que no contribuyen al producto punto
-      if not vector1[index] == 0 and not vector2[index] == 0:
-        dot_prod += vector1[index] * vector2[index]
-    return dot_prod
-  else:
-    # Si los vectores no tienen la misma longitud, devuelve una cadena de texto indicando que la dimensionalidad no coincide
-    return "Unmatching dimensionality"
+# def dot_product(vector1, vector2):
+#   # Calcula el producto punto de dos vectores, solo si tienen la misma longitud
+#   if len(vector1) == len(vector2):
+#     dot_prod = 0
+#     for index in range(0, len(vector1)):
+#       # Ignora los valores de 0 en ambos vectores, ya que no contribuyen al producto punto
+#       if not vector1[index] == 0 and not vector2[index] == 0:
+#         dot_prod += vector1[index] * vector2[index]
+#     return dot_prod
+#   else:
+#     # Si los vectores no tienen la misma longitud, devuelve una cadena de texto indicando que la dimensionalidad no coincide
+#     return "Unmatching dimensionality"
 
 
-def calculate_cosine(query, document):
-  # Calcula el coseno del ángulo entre dos vectores utilizando la fórmula de coseno
-  media = length(query) * length(document)
-  if media == 0:
-    return 0
-  else:
-    cosine = dot_product(query, document) / media
-    return cosine
+# def calculate_cosine(query, document):
+#   # Calcula el coseno del ángulo entre dos vectores utilizando la fórmula de coseno
+#   media = length(query) * length(document)
+#   if media == 0:
+#     return 0
+#   else:
+#     cosine = dot_product(query, document) / media
+#     return cosine
 
-# doc_vectors = vectorize_idf(doc_terms, doc_idfs, all_terms)
+# # doc_vectors = vectorize_idf(doc_terms, doc_idfs, all_terms)
 
-# Pedimos al usuario que escriba algo y procesamos su entrada
-entrada = input("Escriba algo: ")
-entrada_procesada = process(entrada)
+# # Pedimos al usuario que escriba algo y procesamos su entrada
+# entrada = input("Escriba algo: ")
+# entrada_procesada = process(entrada)
 
-# Procesamos los documentos
-docs_procesados = [ process(doc) for i, doc in enumerate(docs) ]
+# # Procesamos los documentos
+# docs_procesados = [ process(doc) for i, doc in enumerate(docs) ]
 
-# Creamos un diccionario con los documentos procesados
-dict_docs = {}
-for i, doc in enumerate(docs_procesados):
-  dict_docs[f"doc{i}"] = doc
+# # Creamos un diccionario con los documentos procesados
+# dict_docs = {}
+# for i, doc in enumerate(docs_procesados):
+#   dict_docs[f"doc{i}"] = doc
 
-# Calculamos los idfs de los términos en la entrada y en los documentos
-doc_idfs = calculate_idfs(entrada_procesada, dict_docs)
+# # Calculamos los idfs de los términos en la entrada y en los documentos
+# doc_idfs = calculate_idfs(entrada_procesada, dict_docs)
 
-# Vectorizamos los documentos con sus idfs
-doc_vectors = vectorize_idf(dict_docs, doc_idfs, entrada_procesada)
+# # Vectorizamos los documentos con sus idfs
+# doc_vectors = vectorize_idf(dict_docs, doc_idfs, entrada_procesada)
 
-# Obtenemos el vector de la entrada
-query_vector = list(doc_idfs.values())
+# # Obtenemos el vector de la entrada
+# query_vector = list(doc_idfs.values())
 
-# Calculamos los cosenos entre el vector de la entrada y los vectores de los documentos
-query_cosines = {}
-for doc_id, doc_vector in doc_vectors.items():
-    cosine = calculate_cosine(query_vector, doc_vector)
-    query_cosines[doc_id] = cosine
+# # Calculamos los cosenos entre el vector de la entrada y los vectores de los documentos
+# query_cosines = {}
+# for doc_id, doc_vector in doc_vectors.items():
+#     cosine = calculate_cosine(query_vector, doc_vector)
+#     query_cosines[doc_id] = cosine
 
-# Ordenamos los documentos según su relevancia y los imprimimos
-for doc_id, cosine in sorted(query_cosines.items(), key=itemgetter(1), reverse=True):
-    print(f"Documento: {doc_id} - Relevancia: {cosine}")
+# # Ordenamos los documentos según su relevancia y los imprimimos
+# for doc_id, cosine in sorted(query_cosines.items(), key=itemgetter(1), reverse=True):
+#     print(f"Documento: {doc_id} - Relevancia: {cosine}")
+
+import spacy
+
+# Cargar el modelo en español de SpaCy
+nlp = spacy.load("es_core_news_sm")
+
+# Definir las dos palabras de las que se quiere calcular la similitud semántica
+palabra1 = nlp("dibujar")
+palabra2 = nlp("pintar")
+
+# Calcular la similitud semántica entre las dos palabras
+similitud = palabra1.similarity(palabra2)
+
+print(f"La similitud semántica entre '{palabra1.text}' y '{palabra2.text}' es de: {similitud}")

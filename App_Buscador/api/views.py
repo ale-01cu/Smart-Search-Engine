@@ -91,6 +91,7 @@ class BusquedaView(viewsets.ViewSet):
     end_time = time.time()
     # Se calcula el tiempo total de ejecución
     tiempo_total = round(end_time - start_time, 4)
+    respuesta.append(tiempo_total)
     # Se imprime el tiempo total de ejecución
     print(f"La busqueda tardo {tiempo_total} segundos en ejecutarse")
     

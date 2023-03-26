@@ -39,7 +39,9 @@ export const Buscador = ({valueInput}) => {
           onChange={handleChange} 
           value={buscador}
           onFocus={handleFocus} 
-          onBlur={handleBlur}/>
+          onBlur={handleBlur}
+          placeholder="Buscar..."
+        />
       </div>
     </form>
   )

@@ -16,16 +16,24 @@ export const ListCards = ({url}) => {
   }, [url]);
 
   return (
-    <div className="grilla">
+    <>
       {
-        cards.map(e => 
-          <Link to={URL_DETALLE + e.id} key={e.id} className="card">
-            <h2>{e.titulo}</h2>
-            {e.categoria}<br/>
-            {e.generos}
-          </Link>
-        )
+        typeof(cards[cards.length - 1]) === 'number' && <h4 className='tiempo'>Se encontraron {cards.length - 1} resultados en {cards.pop()} segundos.</h4>
       }
-    </div>
+
+      <div className="grilla">
+        {
+          cards.map(e => {
+            if (!e.titulo) return null 
+
+            return <Link to={URL_DETALLE + e.id} key={e.id} className="card">
+              <h2>{e.titulo}</h2>
+              {e.categoria}<br/>
+              {e.generos}
+            </Link>
+          })
+        }
+      </div>
+    </>
   )
 }
