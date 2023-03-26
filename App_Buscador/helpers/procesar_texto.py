@@ -6,7 +6,7 @@ import nltk
 
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
-from nltk.stem import PorterStemmer
+from nltk.stem import SnowballStemmer
 from collections import Counter
 
 def procesar(texto):
@@ -14,13 +14,12 @@ def procesar(texto):
   stop_words = set(stopwords.words('spanish'))
 
   # Tokenizar la frase
-  words = word_tokenize(texto)
-  stemmer = PorterStemmer()
+  tokens = word_tokenize(texto)
+  stemmer = SnowballStemmer('spanish')
 
   # Eliminar las palabras vacías
-  filtered_words = [token for token in words if token.isalpha() and token not in stop_words]
-  stemmed_words = [stemmer.stem(word) for word in filtered_words]
-  palabras_Claves_sin_repetirse = list(Counter(stemmed_words).keys())
+  tokens_limpios =  [ stemmer.stem(token.lower()) for token in tokens if token.isalpha() and token not in stop_words ]
+  palabras_Claves_sin_repetirse = list(Counter(tokens_limpios).keys())
   
   return palabras_Claves_sin_repetirse
 
