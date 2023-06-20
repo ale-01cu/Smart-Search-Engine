@@ -198,6 +198,7 @@
 #     palabras_Claves_sin_repetirse = list(Counter(stemmed_words).keys())
 
 #     return palabras_Claves
+
 # from nltk.corpus import stopwords # importa el conjunto de palabras vacías de NLTK
 # from nltk.tokenize import word_tokenize # importa el tokenizador de palabras de NLTK
 # from nltk.stem import SnowballStemmer # importa el stemmer de nieve de NLTK
@@ -230,7 +231,7 @@
 #     counter = Counter(tokens_limpios)
 #     return dict(counter)
   
-# # función para calcular los IDFs de los términos
+# # # función para calcular los IDFs de los términos
 # def calculate_idfs(vocabulary, doc_features):
 #   # crea un diccionario vacío para almacenar los IDFs
 #   doc_idfs = {}
@@ -339,6 +340,8 @@
 # # Ordenamos los documentos según su relevancia y los imprimimos
 # for doc_id, cosine in sorted(query_cosines.items(), key=itemgetter(1), reverse=True):
 #     print(f"Documento: {doc_id} - Relevancia: {cosine}")
+
+
 
 import spacy
 

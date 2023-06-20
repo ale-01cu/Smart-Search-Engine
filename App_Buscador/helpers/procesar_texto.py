@@ -5,36 +5,59 @@ import nltk
 
 
 from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
+from nltk.tokenize import word_tokenize, regexp_tokenize
 from nltk.stem import SnowballStemmer
 from collections import Counter
+import numpy as np
 
 def procesar(texto):
-  
   stop_words = set(stopwords.words('spanish'))
 
   # Tokenizar la frase
-  tokens = word_tokenize(texto)
+  #tokens = word_tokenize(texto)
+  patron = r'\w+|[^\w\s]'
+  tokens = regexp_tokenize(texto, patron)
   stemmer = SnowballStemmer('spanish')
 
   # Eliminar las palabras vacías
-  tokens_limpios =  [ stemmer.stem(token.lower()) for token in tokens if token.isalpha() and token not in stop_words ]
-  palabras_Claves_sin_repetirse = list(Counter(tokens_limpios).keys())
-  
-  return palabras_Claves_sin_repetirse
+  tokens_limpios = [ stemmer.stem(token.lower()) for token in tokens if token.isalnum() and token.lower() not in stop_words ] 
+  return set(tokens_limpios)
+
+
+def cosine_similarity(query, document):
+    query_tokens = procesar(query)
+    document_tokens = procesar(document)
+    
+    # Calcular la frecuencia de las palabras en la consulta y el documento
+    query_freq = dict(nltk.FreqDist(query_tokens))
+    document_freq = dict(nltk.FreqDist(document_tokens))
+        
+    # Obtener un conjunto único de todas las palabras en la consulta y el documento
+    all_words = set(query_freq.keys()).union(set(document_freq.keys()))
+    
+    # Crear vectores de frecuencia para la consulta y el documento
+    query_vector = np.array([query_freq.get(word, 0) for word in all_words])
+    document_vector = np.array([document_freq.get(word, 0) for word in all_words])
+    
+    # Calcular la similitud coseno entre los vectores de frecuencia
+    dot_product = np.dot(query_vector, document_vector)
+    query_norm = np.linalg.norm(query_vector)
+    document_norm = np.linalg.norm(document_vector)
+    similarity = dot_product / (query_norm * document_norm)
+    
+    return similarity
 
 
 def search(query, document):
   document_procesado = procesar(document)
-  doc_text = " ".join(document_procesado)
   
   coincidencias = 0
 
-  for querys in query:
-    if doc_text.count(querys) > 0: coincidencias += 1
+  print("query procesada ***", query)
+  print("documento procesado ***", document_procesado)
+  similitud = cosine_similarity(query, document)
   
-  mensaje = f'Comparacion:\n query: {query} \n doc: {document_procesado} \n coincidencias {coincidencias}'
-  print(mensaje)
   
-  return coincidencias
-
+  mensaje = f'Comparacion:\n query: {query} \n doc: {document_procesado} \n coincidencias {similitud}'
+  
+  return similitud

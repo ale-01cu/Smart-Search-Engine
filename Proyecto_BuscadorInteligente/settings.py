@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+from elasticsearch_dsl.connections import connections
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -87,6 +88,19 @@ DATABASES = {
 }
 
 
+# ELASTICSEARCH_DSL = {
+#     'default': {
+#         'hosts': 'localhost:9200'
+#     },
+# }
+
+try:
+    connections.create_connection(hosts=['localhost:9200'])
+    print("conexion establecida con elastic")
+except Excepcion as e:
+    print(e)
+
+
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
@@ -134,8 +148,11 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Cors
+
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "http://localhost:8000",
 ]
 
 CSRF_TRUSTED_ORIGINS = [

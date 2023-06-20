@@ -2,8 +2,9 @@ from rest_framework import viewsets, status, generics, filters
 from App_Buscador.models import Contenido
 from .serializers import SerializerContenido
 from rest_framework.response import Response
-from App_Buscador.helpers.ordenamiento_Quicksort import Quicksort, burbuja
 from App_Buscador.helpers.procesar_texto import search, procesar
+from App_Buscador.helpers.clase_resultados_query import Resultados, diccionario_resultados
+from .pagination import ContenidoPagination
 import time
 
 # Create your views here.
@@ -12,6 +13,19 @@ import time
 class ContenidoView(viewsets.ModelViewSet):
     queryset = Contenido.objects.all()
     serializer_class = SerializerContenido
+    pagination_class = ContenidoPagination
+    
+    def retrieve(self, request, *args, **kwargs):
+      q = self.request.query_params.get('q', None)
+      id_elemnto = kwargs.get('pk')
+      
+      if q:
+        query_procesada = procesar(q)
+        query_procesada_texto = " ".join(query_procesada)
+        object_resultados = diccionario_resultados[query_procesada_texto]
+        object_resultados.actualizarInteraccion(id_elemnto)
+        
+      return super().retrieve(request, *args, **kwargs)
 
 # import operator
 # from functools import reduce
@@ -53,47 +67,79 @@ class ContenidoView(viewsets.ModelViewSet):
 #     # Serializar los resultados y devolverlos
 #     serializer = SerializerContenido(queryset, many=True)
 #     return Response(serializer.data, status=status.HTTP_200_OK)
-  
+
+from elasticsearch_dsl import Search
+from elasticsearch_dsl import Q
 
 class BusquedaView(viewsets.ViewSet):
+   
   def list(self, request, busqueda):
+      query_busqueda = request.query_params.get('busqueda', None).lower()
+      procesada = ' '.join(procesar(query_busqueda))
+      q = Q('bool',
+          should=[
+              Q('multi_match', query=procesada, fields=['titulo', 'categoria', 'generos', 'descripcion']),
+              Q('more_like_this', like=procesada, fields=['titulo', 'categoria', 'generos', 'descripcion']),
+          ],
+          minimum_should_match=1,
+      )
+
+      # Agregar la búsqueda wildcard para tener en cuenta las palabras que contienen la consulta
+      for palabra in procesada.split():
+          q |= Q('wildcard', titulo={'value': f'*{palabra}*'}) | Q('wildcard', categoria={'value': f'*{palabra}*'}) | Q('wildcard', generos={'value': f'*{palabra}*'}) | Q('wildcard', descripcio={'value': f'*{palabra}*'})
+
+      s = Search(index='contenido').query(q)
+      response = s.execute()
+
+      resultados = []
+      for hit in response.hits:
+          resultados.append(hit.to_dict())
+
+      return Response(resultados, status=status.HTTP_200_OK)
+
+
+    # resultados_por_querys = {}
   
-    # Se obtiene el tiempo en el que se inicia la ejecución de la búsqueda
-    start_time = time.time()
+    # # Se obtiene el tiempo en el que se inicia la ejecución de la búsqueda
+    # start_time = time.time()
 
-    # Se obtiene el parámetro "busqueda" de la URL y se convierte a minúsculas
-    query_busqueda = request.query_params.get('busqueda', None).lower()
-    query_procesada = procesar(query_busqueda)
+    # # Se obtiene el parámetro "busqueda" de la URL y se convierte a minúsculas
+    # query_busqueda = request.query_params.get('busqueda', None).lower()
+    # query_procesada = procesar(query_busqueda)
+    # query_procesada_texto = " ".join(query_procesada)
+    
+    # if " ".join(query_procesada) in diccionario_resultados.keys():
+    #   return Response(diccionario_resultados[query_procesada_texto].resultados, status=status.HTTP_200_OK)
 
-    # Se obtienen todos los objetos Contenido de la base de datos
-    querySets = Contenido.objects.all()
+    # querySets = Contenido.objects.all()
+    # serializer = SerializerContenido(querySets, many=True)
 
-    # Se serializan los objetos obtenidos para poder manipularlos en Python
-    serializer = SerializerContenido(querySets, many=True)
-
-    resultado = []
+    # resultado = []
           
-    # Se itera sobre los objetos serializados para buscar coincidencias con la búsqueda
-    for i in serializer.data:
-      # Se concatenan todos los campos de un objeto en un string y se convierte a minúsculas
-      todo = f"{i['categoria']}s {i['titulo']} {i['descripcion']} {i['fecha_de_estreno']} {i['generos']}".lower()
-      # Se llama a la función search para buscar coincidencias entre la búsqueda y el string concatenado
-      coincidencias = search(query_procesada, todo)
-      # Si se encontraron coincidencias, se agrega el objeto y el número de coincidencias a la lista de resultados
-      if coincidencias > 0: resultado.append({"e": i, "c":coincidencias})
+    # # Se itera sobre los objetos serializados para buscar coincidencias con la búsqueda
+    # for i in serializer.data:
+    #   todo = f"{i['categoria']}s {i['titulo']} {i['descripcion']} {i['fecha_de_estreno']} {i['generos']}".lower()
+    #   coincidencias = search(query_busqueda, todo)
+    #   if coincidencias > 0: resultado.append({"e": i, "c":coincidencias})
       
-    # Se ordenan los resultados por número de coincidencias, de mayor a menor
-    ordenados = sorted(resultado, key=lambda x: x['c'], reverse=True)
-    # Se crea una lista solo con los objetos ordenados (sin el número de coincidencias)
-    respuesta = [e['e'] for e in ordenados]
+    # # Se ordenan los resultados por número de coincidencias, de mayor a menor
+    # ordenados = sorted(resultado, key=lambda x: x['c'], reverse=True)
+    # # Se crea una lista solo con los objetos ordenados (sin el número de coincidencias)
+    # respuesta = [e['e'] for e in ordenados]
     
-    # Se obtiene el tiempo en el que se termina la ejecución de la búsqueda
-    end_time = time.time()
-    # Se calcula el tiempo total de ejecución
-    tiempo_total = round(end_time - start_time, 4)
-    respuesta.append(tiempo_total)
-    # Se imprime el tiempo total de ejecución
-    print(f"La busqueda tardo {tiempo_total} segundos en ejecutarse")
+    # nuevo_resultado = Resultados(query_procesada, respuesta)
+    # nuevo_resultado.entrenar()
+    # respuesta = nuevo_resultado.resultados.copy()
     
-    # Se devuelve la lista de objetos ordenados como respuesta
-    return Response(respuesta, status=status.HTTP_200_OK)
+    # diccionario_resultados[" ".join(query_procesada)] = nuevo_resultado
+  
+    # # Se obtiene el tiempo en el que se termina la ejecución de la búsqueda
+    # end_time = time.time()
+    # # Se calcula el tiempo total de ejecución
+    # tiempo_total = round(end_time - start_time, 2)
+    # respuesta.append(tiempo_total)
+    # # Se imprime el tiempo total de ejecución
+    # print(f"La busqueda tardo {tiempo_total} segundos en ejecutarse")
+    
+    # # Se devuelve la lista de objetos ordenados como respuesta
+    # return Response(respuesta, status=status.HTTP_200_OK)
