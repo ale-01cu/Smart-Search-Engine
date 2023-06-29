@@ -10,6 +10,13 @@ from nltk.stem import SnowballStemmer
 from collections import Counter
 import numpy as np
 
+def aplicar_stop_words(texto):
+  stop_words = set(stopwords.words('spanish'))
+  patron = r'\w+|[^\w\s]'
+  tokens = regexp_tokenize(texto, patron)
+  tokens_limpios = [ token.lower() for token in tokens if token.isalnum() and token.lower() not in stop_words ] 
+  return " ".join(tokens_limpios)
+
 def procesar(texto):
   stop_words = set(stopwords.words('spanish'))
 

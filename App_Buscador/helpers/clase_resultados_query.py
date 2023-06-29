@@ -30,14 +30,21 @@ class Resultados():
     self.documentos_etiquetados = get_todos_documentos_etiquetados()
     self.promedio_suma_vectores = 0
   
+
+  def get_resultados(self):
+    return self.resultados
+
+
   def armar_interacciones(self):
     for res in self.resultados:
       self.interacciones[str(res['id'])] = 0
   
+
   def etiquetarResultados(self):
     for i in self.resultados:
-      self.resultadosEtiquetados[i['id']] = f"{i['categoria']}s {i['titulo']} {i['descripcion']} {i['fecha_de_estreno']} {i['generos']}".lower()
+      self.resultadosEtiquetados[i['id']] = f"{i['categoria']}s {i['titulo']} {i['descripcion']} {i['generos']}".lower()
     
+
   def sumar_vectores(self):
     for id, vector in self.tf_idf_vectores_resultados.items():
       if str(id) in self.interacciones.keys():
@@ -48,7 +55,6 @@ class Resultados():
 
   def ordenar_vectores(self):
     self.suma_vectores = dict(sorted(self.suma_vectores.items(), key=lambda x: x[1], reverse=True))
-
 
     
   def actualizar_vectores(self, id:int):
@@ -73,7 +79,6 @@ class Resultados():
           resultados_auxiliar.append(res)
           break
       
-    
     for i, ob in enumerate(self.resultados):
       self.resultados[i] = resultados_auxiliar[i]
       
@@ -81,20 +86,19 @@ class Resultados():
     aux = dict(filter(lambda x: str(x[0]) in self.interacciones.keys(), self.tf_idf_vectores_resultados.items()))
     self.tf_idf_vectores_resultados = aux
   
+
   def calcular_promedio_suma_vectores(self):
     tamaño = len(self.suma_vectores)
     suma_total = 0
     
     for key, suma in self.suma_vectores.items():
       suma_total += suma
-      
 
     if suma_total == 0 and tamaño == 0:
       self.promedio_suma_vectores = 0
     else:
       self.promedio_suma_vectores = (suma_total / tamaño)
-      
-      
+            
     
   def entrenar(self):
     if len(self.resultados) > 0:

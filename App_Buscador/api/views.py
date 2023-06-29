@@ -2,91 +2,101 @@ from rest_framework import viewsets, status, generics, filters
 from App_Buscador.models import Contenido
 from .serializers import SerializerContenido
 from rest_framework.response import Response
-from App_Buscador.helpers.procesar_texto import search, procesar
+from App_Buscador.helpers.procesar_texto import search, procesar, aplicar_stop_words
 from App_Buscador.helpers.clase_resultados_query import Resultados, diccionario_resultados
 from .pagination import ContenidoPagination
 import time
+from elasticsearch_dsl import function
+from App_Buscador.helpers.clase_resultados_query_2 import Resultados_2
+from App_Buscador.helpers.class_resultados_definitiva import Resultados_2_pesos
 
-# Create your views here.
-# 
-# 
+# def promedioDocument():
+#      # Obtener la longitud promedio de los documentos en cada campo
+#     avg_titulo_len = function.AvgField(field='nombre.length')
+#     avg_descripcion_len = function.AvgField(field='descripcion.length')
+#     avg_generos_len = function.AvgField(field='canal.nombre.length')
+#     avg_categoria_len = function.AvgField(field='palabraClave.length')
+
+#     # Crear las funciones de puntuación usando la longitud promedio de los documentos en cada campo
+#     funciones = [
+#         function.FieldValueFactor(field='nombre.length', modifier='none', factor=1.0/avg_titulo_len),
+#         function.FieldValueFactor(field='descripcion.length', modifier='none', factor=1.0/avg_descripcion_len),
+#         function.FieldValueFactor(field='canal.nombre.length', modifier='none', factor=1.0/avg_generos_len),
+#         function.FieldValueFactor(field='palabraClave.length', modifier='none', factor=1.0/avg_categoria_len),
+#     ]
+#     return funciones  
+
+# def query_exacta(query,):
+    
+#     funciones=promedioDocument()
+#     # Crear la consulta de coincidencias exactas con la cláusula function_score
+#     q_exacta = Q('function_score',
+#         query=Q('multi_match', query=query, fields=['nombre^4', 'descripcion^1', 'palabraClave^3', 'canal.nombre^2']),
+#         functions=funciones,
+#         boost_mode='replace'
+#     )
+
+#     return q_exacta
+
+# def query_degradada(query,):
+    
+#     funciones=promedioDocument()
+#     # Crear la consulta de coincidencias parciales con la cláusula function_score
+#     q_degradada = Q('function_score',
+#         query=Q('more_like_this', like=query, fields=['nombre^4', 'canal.nombre^2', 'palabraClave^3', 'descripcion^0.5']),
+#         functions=funciones,
+#         boost_mode='replace'
+#     )
+
+#     return q_degradada
+
+# def query_wildcard(query):
+#     # Obtener las funciones de puntuación
+#     funciones = promedioDocument()
+
+#     # Crear la consulta de coincidencias parciales con la cláusula function_score
+#     q_wildcard = Q('function_score', boost_mode='replace').query(
+#         'multi_match', query=query, fields=['nombre^4', 'descripcion^1', 'canal.nombre^2', 'palabraClave^3']
+#     )
+#     q_wildcard = q_wildcard.functions(funciones)
+
+#     return q_wildcard
+
+
 class ContenidoView(viewsets.ModelViewSet):
     queryset = Contenido.objects.all()
     serializer_class = SerializerContenido
     pagination_class = ContenidoPagination
-    
-    def retrieve(self, request, *args, **kwargs):
-      q = self.request.query_params.get('q', None)
-      id_elemnto = kwargs.get('pk')
-      
-      if q:
-        query_procesada = procesar(q)
-        query_procesada_texto = " ".join(query_procesada)
-        object_resultados = diccionario_resultados[query_procesada_texto]
-        object_resultados.actualizarInteraccion(id_elemnto)
-        
-      return super().retrieve(request, *args, **kwargs)
 
-# import operator
-# from functools import reduce
-# from django.db.models import Q, Sum, Case, When, IntegerField
-# class BusquedaView(viewsets.ViewSet):
-#   def list(self, request, busqueda):
-#     query_busqueda = request.query_params.get('busqueda', '').lower()
-#     palabras_claves = query_busqueda.split(" ")
-    
-#     if not palabras_claves:
-#         # Si no hay palabras clave, devolver todos los contenidos
-#         queryset = Contenido.objects.all()
-#     else:
-#         # Si hay palabras clave, filtrar los contenidos que las contengan
-#         queryset = Contenido.objects.filter(
-#             reduce(operator.and_, (Q(categoria__icontains=palabra) | 
-#                                     Q(titulo__icontains=palabra) | 
-#                                     Q(descripcion__icontains=palabra) | 
-#                                     Q(fecha_de_estreno__icontains=palabra) | 
-#                                     Q(generos__icontains=palabra) 
-#                                     for palabra in palabras_claves))
-#         )
-        
-#     # Ordenar los resultados por cantidad de coincidencias
-#     queryset = queryset.annotate(coincidencias=Sum(
-#         Case(
-#             When(
-#                 reduce(operator.and_, (Q(categoria__icontains=palabra) | 
-#                                         Q(titulo__icontains=palabra) | 
-#                                         Q(descripcion__icontains=palabra) | 
-#                                         Q(fecha_de_estreno__icontains=palabra) | 
-#                                         Q(generos__icontains=palabra) 
-#                                         for palabra in palabras_claves)), 
-#                 then=1), 
-#             output_field=IntegerField()
-#         )
-#     )).order_by('-coincidencias')
-    
-#     # Serializar los resultados y devolverlos
-#     serializer = SerializerContenido(queryset, many=True)
-#     return Response(serializer.data, status=status.HTTP_200_OK)
-
-from elasticsearch_dsl import Search
+from elasticsearch_dsl import Search, SF
 from elasticsearch_dsl import Q
 
 class BusquedaView(viewsets.ViewSet):
    
   def list(self, request, busqueda):
+      start_time = time.time()
+
       query_busqueda = request.query_params.get('busqueda', None).lower()
       procesada = ' '.join(procesar(query_busqueda))
-      q = Q('bool',
+      limpias = aplicar_stop_words(query_busqueda)
+
+      q = Q(
+          'bool',
           should=[
-              Q('multi_match', query=procesada, fields=['titulo', 'categoria', 'generos', 'descripcion']),
-              Q('more_like_this', like=procesada, fields=['titulo', 'categoria', 'generos', 'descripcion']),
+              Q('match_phrase', titulo={'query': limpias, 'slop': 1, 'boost': 6}),
+              Q('multi_match', query=limpias, fields=[
+                'titulo^4', 'categoria^3', 'generos^2', 'descripcion^0.2'
+                ], boost=5, fuzziness='AUTO'),
+              Q('more_like_this', like=procesada, fields=[
+                'titulo^4', 'categoria^3', 'generos^2', 'descripcion^0.2'
+                ], boost=4),
           ],
           minimum_should_match=1,
-      )
+          )
 
       # Agregar la búsqueda wildcard para tener en cuenta las palabras que contienen la consulta
       for palabra in procesada.split():
-          q |= Q('wildcard', titulo={'value': f'*{palabra}*'}) | Q('wildcard', categoria={'value': f'*{palabra}*'}) | Q('wildcard', generos={'value': f'*{palabra}*'}) | Q('wildcard', descripcio={'value': f'*{palabra}*'})
+          q |= Q('wildcard', nombre={'value': f'*{palabra}*'}) | Q('wildcard', categoria={'value': f'*{palabra}*'}) | Q('wildcard', generos={'value': f'*{palabra}*'}) | Q('wildcard', descripcio={'value': f'*{palabra}*'})
 
       s = Search(index='contenido').query(q)
       response = s.execute()
@@ -95,7 +105,56 @@ class BusquedaView(viewsets.ViewSet):
       for hit in response.hits:
           resultados.append(hit.to_dict())
 
-      return Response(resultados, status=status.HTTP_200_OK)
+      pesos = {
+        "titulo": 0.4,
+        "descripcion": 0.1,
+        "generos": 0.3,
+        "categoria": 0.2,
+      }
+
+
+      #res = Resultados_2(procesada, resultados)
+      res2 = Resultados_2_pesos(procesada, resultados, pesos)
+      resultados = res2.get_resultados_ordenados()
+
+      end_time = time.time()
+      tiempo_total = round(end_time - start_time, 2)
+      print(f"La busqueda tardo {tiempo_total} en ejecutarse.")
+
+      return Response(
+        resultados, 
+        status=status.HTTP_200_OK
+      )
+
+
+  # def list(self, request, busqueda):
+  #     query_busqueda = request.query_params.get('busqueda', None).lower()
+  #     procesada = ' '.join(procesar(query_busqueda))
+  #     limpias = aplicar_stop_words(query_busqueda)
+
+  #     q = Q(
+  #         'bool',
+  #         should=[
+  #             Q('match_phrase', nombre={'query': procesada, 'slop': 1}),
+  #             Q('multi_match', query=procesada, fields=['nombre^4', 'canal.nombre^2', 'palabraClave¨3', 'descripcion^1']),
+  #             Q('more_like_this', like=procesada, fields=['nombre^4', 'canal.nombre^2', 'palabraClave¨3', 'descripcion^1']),
+  #         ],
+  #         minimum_should_match=1,
+  #         )
+
+  #     # Agregar la búsqueda wildcard para tener en cuenta las palabras que contienen la consulta
+  #     for palabra in procesada.split():
+  #         q |= Q('wildcard', nombre={'value': f'*{palabra}*'}) #| Q('wildcard', categoria={'value': f'*{palabra}*'}) | Q('wildcard', generos={'value': f'*{palabra}*'}) | Q('wildcard', descripcio={'value': f'*{palabra}*'})
+
+  #     s = Search(index='publicacion-index').query(q)
+  #     response = s.execute()
+
+  #     resultados = []
+  #     for hit in response.hits:
+  #         resultados.append(hit.to_dict())
+
+  #     return Response(resultados, status=status.HTTP_200_OK)
+
 
 
     # resultados_por_querys = {}

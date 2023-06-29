@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { fetching } from '../services/Fetching'
 
 export const DetailCard = ({id, query}) => {
-  const URL_DETAIL = 'http://localhost:8000/api/contenido/' + id + "/?q=" + query
+  const URL_DETAIL = 'http://localhost:8000/api/contenido/' + id + "/"
   const [detail, setDetail] = useState({})
   console.log(query);
 

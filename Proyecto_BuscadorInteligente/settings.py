@@ -40,8 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_elasticsearch_dsl',
     "corsheaders",
     'App_Buscador',
+
 ]
 
 MIDDLEWARE = [
@@ -88,14 +90,17 @@ DATABASES = {
 }
 
 
-# ELASTICSEARCH_DSL = {
-#     'default': {
-#         'hosts': 'localhost:9200'
-#     },
-# }
+ELASTICSEARCH_DSL={
+    'default': {
+        #'hosts': '10.37.41.174:9200'
+        'hosts': 'localhost:9200'
+        
+    },
+}
 
 try:
     connections.create_connection(hosts=['localhost:9200'])
+    #connections.create_connection(hosts=['10.37.41.174:9200'])
     print("conexion establecida con elastic")
 except Excepcion as e:
     print(e)
