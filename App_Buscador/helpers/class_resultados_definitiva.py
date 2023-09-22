@@ -1,8 +1,8 @@
-from .clase_resultados_query import Resultados
 import math
-from operator import itemgetter
 import nltk
 import string
+from .clase_resultados_query import Resultados
+from operator import itemgetter
 from nltk import word_tokenize, regexp_tokenize
 from nltk.corpus import stopwords
 from nltk.stem.lancaster import LancasterStemmer
@@ -12,15 +12,15 @@ from nltk.stem import SnowballStemmer
 
 class Resultados_2_pesos:
   def __init__(self, query, resultados, pesos):
-    self.query = query
+    self.query = query # query
     self.resultados = resultados.copy()
     self.pesos = pesos
-    self.resultados_etiquetados_por_id = self.build_resultados_etiquetados_por_id()
+    self.resultados_etiquetados_por_id = self.build_resultados_etiquetados_por_id() #Result
     self.doc_terms = {}
     self.qry_terms = {}
     
     # Paso 1
-    self.build_terms()
+    self.build_terms() #Result
 
     # # Paso 2
     self.all_terms = self.collect_vocabulary()
@@ -105,7 +105,6 @@ class Resultados_2_pesos:
     for word in word_list:
       terms[word] = terms.get(word, 0) + 1
     return terms
-
 
 
   def collect_vocabulary(self):

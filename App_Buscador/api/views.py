@@ -9,6 +9,8 @@ import time
 from elasticsearch_dsl import function
 from App_Buscador.helpers.clase_resultados_query_2 import Resultados_2
 from App_Buscador.helpers.class_resultados_definitiva import Resultados_2_pesos
+from App_Buscador.searcher.results_controller import ResultsController
+from App_Buscador.searcher.query import Query
 
 # def promedioDocument():
 #      # Obtener la longitud promedio de los documentos en cada campo
@@ -101,9 +103,9 @@ class BusquedaView(viewsets.ViewSet):
       s = Search(index='contenido').query(q)
       response = s.execute()
 
-      resultados = []
-      for hit in response.hits:
-          resultados.append(hit.to_dict())
+      # resultados = []
+      # for hit in response.hits:
+      #     resultados.append(hit.to_dict())
 
       pesos = {
         "titulo": 0.4,
@@ -113,16 +115,43 @@ class BusquedaView(viewsets.ViewSet):
       }
 
 
+      query_object = Query(query_busqueda)
+      query_procesed = query_object.query_terms_joined()
+
+      results = ResultsController(
+        query_object, 
+        response.hits, 
+        pesos
+      )
+
+      docs_terms:dict = results.build_docs_terms()
+      query_terms:dict = query_object.query_terms
+
+      vocabulary:dict = results.collect_vocabulary(docs_terms)
+
+      docs_vertors:dict = results.vectorize(docs_terms, vocabulary)
+      query_vectors:dict = results.vectorize(query_terms, vocabulary)
+
+      docs_idfs_vectors:dict = results.calculate_idf_verctors(docs_terms, vocabulary)
+
+      cosine_similarity_docs:dict = results.calculate_cosine_similarity(
+        query_vectors, 
+        docs_idfs_vectors
+      )
+
+      sorted_results = results.sorted_results(cosine_similarity_docs)
+      response = results.sorted_docs(sorted_results)
+
       #res = Resultados_2(procesada, resultados)
-      res2 = Resultados_2_pesos(procesada, resultados, pesos)
-      resultados = res2.get_resultados_ordenados()
+      # res2 = Resultados_2_pesos(procesada, resultados, pesos)
+      # resultados = res2.get_resultados_ordenados()
 
       end_time = time.time()
       tiempo_total = round(end_time - start_time, 2)
       print(f"La busqueda tardo {tiempo_total} en ejecutarse.")
 
       return Response(
-        resultados, 
+        response, 
         status=status.HTTP_200_OK
       )
 

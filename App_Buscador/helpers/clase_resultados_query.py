@@ -64,8 +64,6 @@ class Resultados():
     self.ordenar_vectores()
     print(self.suma_vectores)
 
-
-
   def actualizar_resultados(self):
     resultados_auxiliar = []
 
