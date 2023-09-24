@@ -1,6 +1,6 @@
-from ABC import abc, abstractmethod
+from abc import ABC, abstractmethod
 
-class ResultsControllerInterface(abc):
+class ResultsControllerInterface(ABC):
 	@abstractmethod
 	def label_results_by_id(self) -> dict: 
 		raise NotImplementedError

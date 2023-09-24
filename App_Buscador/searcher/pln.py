@@ -21,15 +21,15 @@ class PLN:
 
 
 	def get_processed_terms(self, text:str) -> dict:
-	    word_list = [
-	        self.stemmer.stem(word.lower()) for word in regexp_tokenize(text, self.pattern)
-	        if word.isalnum() 
-	        and word.lower() not in self.stop_list_spanish 
-	        and word.lower() not in self.stop_list_english 
-	        and word.lower() not in string.punctuation
-	      ]
+		word_list = [
+			self.stemmer.stem(word.lower()) for word in regexp_tokenize(text, self.pattern)
+			if word.isalnum() 
+			and word.lower() not in self.stop_list_spanish 
+			and word.lower() not in self.stop_list_english 
+			and word.lower() not in string.punctuation
+			]
 
-	    for word in word_list:
-	      self.terms[word] = self.terms.get(word, 0) + 1
+		for word in word_list:
+			self.terms[word] = self.terms.get(word, 0) + 1
 
-	    return self.terms
+		return self.terms

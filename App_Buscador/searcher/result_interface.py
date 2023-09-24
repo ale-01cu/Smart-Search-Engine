@@ -1,6 +1,6 @@
-from ABC import abc, abstractmethod
+from abc import ABC, abstractmethod
 
-class ResultInterface(abc):
+class ResultInterface(ABC):
 	@abstractmethod
 	def get_id_tagged_content(self) -> dict:
 		raise NotImplementedError	    
