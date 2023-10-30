@@ -9,18 +9,18 @@ class PLN:
 	stop_list_spanish: set
 	stop_list_english: set
 	pattern: str
-	terms: dict
 	stemmer: None
 
 	def __init__(self) -> None:
 		self.stop_list_spanish = set(stopwords.words('spanish'))
 		self.stop_list_english = set(stopwords.words('english'))
 		self.pattern = r'\w+|[^\w\s]'
-		self.terms = {}
 		self.stemmer = SnowballStemmer('spanish')
 
 
 	def get_processed_terms(self, text:str) -> dict:
+		local_terms:dict = {}
+
 		word_list = [
 			self.stemmer.stem(word.lower()) for word in regexp_tokenize(text, self.pattern)
 			if word.isalnum() 
@@ -30,6 +30,6 @@ class PLN:
 			]
 
 		for word in word_list:
-			self.terms[word] = self.terms.get(word, 0) + 1
+			local_terms[word] = local_terms.get(word, 0) + 1
 
-		return self.terms
+		return local_terms

@@ -32,9 +32,10 @@ class Resultados_2_pesos:
     # # Paso 4
     self.doc_idfs = self.calculate_idfs(self.all_terms, self.doc_terms)
 
+
     # # Paso 5
     self.doc_vectors = self.vectorize_idf(self.doc_terms, self.doc_idfs, self.all_terms)
-
+    
     # # Paso 6
     self.queryB = self.qry_vectors.get("1")
     self.results = {}
@@ -45,7 +46,6 @@ class Resultados_2_pesos:
       self.results[doc_id] = cosine  
 
     self.sorted_results = sorted(self.results.items(), key=itemgetter(1), reverse=True)[:44]
-
 
   def get_resultados_ordenados(self):
     lista_ordenada = []
@@ -112,7 +112,7 @@ class Resultados_2_pesos:
     for doc_id in self.doc_terms.keys():
       for term in self.doc_terms.get(doc_id).keys():
         all_terms.append(term)
-    for term in self.qry_terms.keys():
+    for term in self.qry_terms.get("1").keys():
       all_terms.append(term)
     return sorted(set(all_terms))
 

@@ -10,8 +10,8 @@ class Query:
 
 	@property	
 	def query_terms(self) -> dict:
-		return self.text_procesor.get_processed_terms(self.query)
+		return {"1": self.text_procesor.get_processed_terms(self.query)}
 
 	@property
 	def query_terms_joined(self) -> str:
-		return " ".join(self.query_terms.items())
+		return " ".join(self.query_terms.keys())

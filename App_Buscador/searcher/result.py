@@ -15,7 +15,7 @@ class Result:
 		self.text_procesor = PLN()
 
 	def get_id_tagged_content(self) -> dict:
-		aux: dict = {} 
+		aux:dict = {} 
 		aux[self.content['id']] = self.content
 		return aux
 

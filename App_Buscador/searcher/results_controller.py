@@ -10,9 +10,6 @@ class ResultsController(ResultsControllerInterface):
 	query: Query
 	weight: dict
 	results: list
-	results_tagged_by_id: dict
-	docs_terms: dict
-	all_terms: dict
 	idf: Idf
 	cosine_similarity: CosineSimilarity
 
@@ -20,7 +17,7 @@ class ResultsController(ResultsControllerInterface):
 		self.query = query
 		self.weight = weight
 		self.results = []
-		self.idf = Idf()
+		self.idf = Idf(self.weight)
 		self.cosine_similarity = CosineSimilarity()
 
 		for res in results:
@@ -30,10 +27,6 @@ class ResultsController(ResultsControllerInterface):
 					self.weight
 				)
 			)
-
-		self.results_tagged_by_id = {}
-		self.docs_terms = {}
-		self.all_terms = {}
 
 	def label_results_by_id(self) -> dict:
 		results_tagged_by_id:dict = {}
@@ -53,7 +46,7 @@ class ResultsController(ResultsControllerInterface):
 		docs_terms:dict = {}
 
 		for res in self.results:
-			content_terms:dict = res.get_terms()
+			content_terms:dict = {res.content['id']: res.get_terms()}
 			new_docs_terms:dict = merge_dict(
 				docs_terms,
 				content_terms
@@ -68,23 +61,23 @@ class ResultsController(ResultsControllerInterface):
 			for term in docs_terms.get(doc_id).keys():
 				all_terms.append(term)
 		
-		for term in self.query.query_terms.keys():
+		for term in self.query.query_terms.get("1").keys():
 			all_terms.append(term)
 
 		return sorted(set(all_terms))
 
 
 	def vectorize(self, input_features:dict, vocabulary:list) -> dict:
-		output: dict = {}
+		output:dict = {}
 		for item_id in input_features.keys():
-			features:str = input_features.get(item_id)
+			features = input_features.get(item_id)
 			output_vector:list = []
 			for word in vocabulary:
 				if word in features.keys():
 					output_vector.append(int(features.get(word)))
 				else:
 					output_vector.append(0)
-				output[item_id] = output_vector
+			output[item_id] = output_vector
 		return output
 
 
@@ -93,6 +86,7 @@ class ResultsController(ResultsControllerInterface):
 			vocabulary, 
 			docs_terms
 		)
+
 		docs_idfs_vectors:dict = self.idf.vectorize_idf(
 			docs_terms, 
 			docs_idfs, 
@@ -104,12 +98,11 @@ class ResultsController(ResultsControllerInterface):
 
 	def calculate_cosine_similarity(self, query_vector:list, docs_vector:dict) -> dict:
 		result:dict = {}
-
 		for doc_id in docs_vector.keys():
 			document:list = docs_vector.get(doc_id)
 			cosine:float = self.cosine_similarity.calculate_cosine(
-			query_vector, 
-			document
+				query_vector, 
+				document
 			)
 			result[doc_id] = cosine
 
