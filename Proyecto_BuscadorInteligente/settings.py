@@ -102,7 +102,7 @@ try:
     connections.create_connection(hosts=['localhost:9200'])
     #connections.create_connection(hosts=['10.37.41.174:9200'])
     print("conexion establecida con elastic")
-except Excepcion as e:
+except Exception as e:
     print(e)
 
 
