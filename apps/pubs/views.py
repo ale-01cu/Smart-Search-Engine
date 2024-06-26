@@ -11,7 +11,14 @@ from rest_framework import status
 
 class ListPubs(views.APIView):
     def get(self, request: Request):
-        page = int(request.query_params.get('page'))
+        query = request.query_params.get('page')
+        try:
+            query = int(query)
+
+        except:
+            query = 1
+            
+        page = query if query and int(query) > 0 else 1
         pubs = PubsModel().list_all(page=page)
         
         data = {
