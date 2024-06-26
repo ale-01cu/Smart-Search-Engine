@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',
     "corsheaders",
     # 'App_Buscador',
+    "apps.pubs",
 
 ]
 
@@ -147,10 +148,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
+    "http://localhost:5173",
     "http://localhost:8000",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000",
+    "http://localhost:5173",
 ]

@@ -1,27 +1,28 @@
 import {useEffect, useState} from 'react'
 import { Link } from 'wouter';
-import {fetching} from '../services/Fetching'
+import listPubs from '../apis/listPubs'
 
 const URL_DETALLE = '/detalle/'
 
-export const ListCards = ({url, setPagination}) => {
+export const ListCards = ({url, setPagination, params}) => {
   const [cards, setCards] = useState([]);
 
-  useEffect(() => {
-    fetching(url).then(data => {
-      console.log(data)
+  useEffect(() => {2
+    listPubs(params.page).then(({res, data}) => {
 
-      if (data.results) {
+      if (data.pubs) {
         setPagination({'next': data.next, 'previous': data.previous})
-        setCards(data.results)
+        setCards(data.pubs)
       }
       else {
         setPagination({'next': "", 'previous': ""})
-        setCards(data)
+        setCards(data.pubs)
       }
-
     })
-  }, [url, setPagination]);
+  }, [url, setPagination, params.page]);
+
+  console.log(params);
+
 
   return (
     <>
@@ -32,16 +33,17 @@ export const ListCards = ({url, setPagination}) => {
       <div className="grilla">
         {
           cards.map(e => {
-            if (!e.titulo) return null 
-
-            return <Link to={URL_DETALLE + e.id} key={e.id} className="card">
-              <h2>{e.titulo}</h2>
-              {e.categoria}<br/>
-              {e.generos}
-            </Link>
+            return (
+              <Link to={URL_DETALLE + e.id} key={e.id} className="card">
+                <h2>{e.nombre}</h2>
+                <p><span>Descripcion:</span> {e.descripcion}</p>
+                <span><span>Categoria:</span> {e.categoria}</span>
+              </Link>
+            )
           })
         }
       </div>
     </>
   )
 }
+

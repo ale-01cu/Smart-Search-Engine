@@ -1,21 +1,20 @@
 import {Link} from 'wouter'
-
+import { LIST_PUBS_URL } from '../apis/apis'
 
 const Footer = ({next = '', previous = '', setUrlContenido}) => {
 
   const handleClickAnterior = e => {
-    setUrlContenido(previous)
+    setUrlContenido((prev) => prev+ "?page=" + previous)
   }
 
   const handleClickSiguiente = e => {
-    setUrlContenido(next)
+    setUrlContenido((prev) => prev+ "?page=" + next)
   }
-
 
   return <footer>
 
-    <button onClick={handleClickAnterior} disabled={previous === ''} className='btn-previous'>Anterior</button>
-    <button onClick={handleClickSiguiente} disabled={next === ''} className='btn-next'>Siguiente</button>
+    <Link to={"/" + previous} disabled={previous === ''} className='btn-previous'>Anterior</Link>
+    <Link to={"/" + next} disabled={next === ''} className='btn-next'>Siguiente</Link>
   
   </footer>
   

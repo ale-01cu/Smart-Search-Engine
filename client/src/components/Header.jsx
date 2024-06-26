@@ -5,7 +5,7 @@ function Header ({buscador}){
 
   return (
     <header className="App-header">
-      <Link to='http://localhost:8000' className='btn-inicio'>Inicio</Link>
+      <Link to='/' className='btn-inicio'>Inicio</Link>
       <Buscador valueInput={buscador}/>
     </header>
   )

@@ -14,7 +14,14 @@ function Main ({setBuscador, URL_BUSQUEDA, URL_CONTENIDO, setPagination}){
             {params => {
               setQuery('')
               setBuscador("")
-              return <ListCards url={URL_CONTENIDO} setPagination={setPagination}/>
+              return <ListCards url={URL_CONTENIDO} setPagination={setPagination} params={params}/>
+            }}
+          </Route>
+          <Route path='/:page'>
+            {params => {
+              setQuery('')
+              setBuscador("")
+              return <ListCards url={URL_CONTENIDO} setPagination={setPagination} params={params}/>
             }}
           </Route>
 

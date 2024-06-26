@@ -85,11 +85,16 @@ main{
   text-decoration: none;
   color: black;
   flex-direction: column;
+  background-color: wheat;
+  border-radius: 5%;
+  transition: all 0.2s;
 }
+
 
 .card:hover{
   background-color: #dddddd;
 }
+
 
 .detalle {
   display: flex;
@@ -140,18 +145,22 @@ footer{
 
 .btn-previous:not([disabled]){
   margin-right: 5px;
+  text-decoration: none;
+
 }
 
 .btn-previous:not([disabled]), .btn-next:not([disabled]){
   padding: 10px;
   size: 15px;
   font-weight: 500;
-  border: 1px solid white;
   cursor: pointer;
   transition: all 0.3s;
+  color: wheat;
+  text-decoration: none;
 }
 
 .btn-previous:not([disabled]):hover, .btn-next:not([disabled]):hover {
   color: #00BCD4;
-  border: 1px solid #00BCD4;
+  text-decoration: none;
+
 }

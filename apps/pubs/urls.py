@@ -1,6 +1,6 @@
-from pubs.views import ListPubs
+from apps.pubs.views import ListPubs
 from django.urls import path
 
-url_pattern = [
+urlpatterns = [
     path('pubs/', ListPubs.as_view())
 ]
