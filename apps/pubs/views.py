@@ -31,3 +31,10 @@ class ListPubs(views.APIView):
             data=data, 
             status=status.HTTP_200_OK
         )
+    
+
+class GetPubById(views.APIView):
+    def get(self, request: Request, pub_id: int):
+        pub = PubsModel().get_by_id(pub_id)
+        return Response(pub, status=status.HTTP_200_OK)
+

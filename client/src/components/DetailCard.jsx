@@ -1,30 +1,22 @@
 import { useEffect, useState } from 'react'
-import { fetching } from '../services/Fetching'
+import  getPub from "../apis/getPub"
 
 export const DetailCard = ({id, query}) => {
-  const URL_DETAIL = 'http://localhost:8000/api/contenido/' + id + "/"
   const [detail, setDetail] = useState({})
-  console.log(query);
 
   useEffect(() => {
-    fetch(URL_DETAIL)
-      .then(res => res.json())
+    getPub(id)
       .then(data => {
-        console.log(data);
         setDetail(data)
       })
     
-  }, [URL_DETAIL])
+  }, [id])
 
   return (
     <div className='detalle'>
-      <h1>{detail.titulo}</h1>
-      <h4>{detail.fecha_de_estreno}</h4>
+      <h1>{detail.nombre}</h1>
+      <h4>{detail.descripcion}</h4>
       <h4>{detail.categoria}</h4>
-      <h4>{detail.fecha_de_estreno}</h4>
-      <p>{detail.descripcion}
-      </p>
-      <h4>{detail.generos}</h4>
     </div>
   )
 }

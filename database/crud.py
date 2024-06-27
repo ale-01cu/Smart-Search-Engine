@@ -32,8 +32,8 @@ class DatabaseModelBase():
                 return chunk.to_dict('records')
 
     # Función para obtener un registro por ID
-    def get_by_id(self, file_name, id):
-        df = self.read_csv(file_name)
+    def get_by_id(self, id):
+        df = pd.read_csv(self.db_filename)
         return df.loc[df['id'] == id].to_dict('records')[0]
 
     # Función para crear un nuevo registro
