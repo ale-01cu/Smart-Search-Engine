@@ -3,6 +3,7 @@ import { ListCards } from './ListCards'
 import { DetailCard } from './DetailCard'
 import NotFound from '../pages/NotFound'
 import { useState } from 'react'
+import Recommendations from './Recommendations'
 
 function Main ({setBuscador, URL_BUSQUEDA, URL_CONTENIDO, setPagination}){
   const [query, setQuery] = useState({})
@@ -14,14 +15,32 @@ function Main ({setBuscador, URL_BUSQUEDA, URL_CONTENIDO, setPagination}){
             {params => {
               setQuery('')
               setBuscador("")
-              return <ListCards url={URL_CONTENIDO} setPagination={setPagination} params={params}/>
+              return (
+                <div className='home-contain'>
+                  <ListCards 
+                    url={URL_CONTENIDO} 
+                    setPagination={setPagination} 
+                    params={params}
+                  />
+                  <Recommendations/>
+                </div>
+              )
             }}
           </Route>
           <Route path='/:page'>
             {params => {
               setQuery('')
               setBuscador("")
-              return <ListCards url={URL_CONTENIDO} setPagination={setPagination} params={params}/>
+              return (
+                <div className='home-contain'>
+                  <ListCards 
+                    url={URL_CONTENIDO} 
+                    setPagination={setPagination} 
+                    params={params}
+                  />
+                  <Recommendations/>
+                </div>
+              )
             }}
           </Route>
 

@@ -21,9 +21,6 @@ export const ListCards = ({url, setPagination, params}) => {
     })
   }, [url, setPagination, params.page]);
 
-  console.log(params);
-
-
   return (
     <>
       {/* {

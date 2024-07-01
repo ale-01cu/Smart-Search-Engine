@@ -79,9 +79,10 @@ main{
 
 .grilla{
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(258px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
   grid-gap: 10px;
-  padding: 20px 60px;
+  padding: 20px 0px 20px 60px;
+  width: 60%;
 }
 
 .card{
@@ -177,3 +178,36 @@ footer{
 
 }
 
+.home-contain{
+  display: flex;
+  gap: 40px;
+}
+
+.recs-section{
+  width: 40%;
+  padding: 20px 60px 20px 0;
+
+}
+
+.recs-container{
+  border: 2px solid white;
+  border-radius: 10px;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 5px;
+}
+
+.rec-card{
+  border: 1px solid #ababab;
+  padding: 20px ;
+  display: flex;
+  justify-content: start;
+  align-items: start;
+  text-decoration: none;
+  color: black;
+  flex-direction: column;
+  background-color: burlywood;
+  border-radius: 5%;
+  transition: all 0.2s;
+}
