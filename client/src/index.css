@@ -16,6 +16,9 @@ code {
 
 main{
   margin-bottom: 65px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 
@@ -38,7 +41,7 @@ main{
   align-items: center;
   border: 2px solid #ababab;
   width: 100%;
-  padding: 2px;
+  padding: 4px;
   border-radius: 10px;
   transition: all 0.2s;
 }
@@ -66,6 +69,11 @@ main{
   border: none;
   outline: none;
   width: 100%;
+}
+
+.input-search{
+  background-color: transparent;
+  color: white;
 }
 
 
@@ -102,6 +110,9 @@ main{
   align-items: center;
   flex-direction: column;
   border: 2px solid #212121;
+  color: wheat;
+  padding: 24px;
+  max-width: 56rem;
 }
 
 .btn-inicio{
@@ -109,7 +120,7 @@ main{
   color: black;
   margin-right: 10px;
   background-color: #dddddd;
-  padding: 10px;
+  padding: 10px 15px;
   transition: all 0.3s;
   border-radius: 10px;
 }
@@ -119,7 +130,7 @@ main{
 }
 
 .btn-buscar{
-  background-color: white;
+  background-color: transparent;
 }
 
 .container-not-found{
@@ -141,6 +152,7 @@ footer{
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 2rem;
 }
 
 .btn-previous:not([disabled]){
@@ -164,3 +176,4 @@ footer{
   text-decoration: none;
 
 }
+

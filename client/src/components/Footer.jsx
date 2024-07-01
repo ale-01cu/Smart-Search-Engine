@@ -13,8 +13,21 @@ const Footer = ({next = '', previous = '', setUrlContenido}) => {
 
   return <footer>
 
-    <Link to={"/" + previous} disabled={previous === ''} className='btn-previous'>Anterior</Link>
-    <Link to={"/" + next} disabled={next === ''} className='btn-next'>Siguiente</Link>
+    <Link 
+      to={"/" + previous} 
+      disabled={previous === ''} 
+      className='btn-previous'
+    >
+        Anterior
+      </Link>
+    
+    <Link 
+      to={"/" + next} 
+      disabled={next === ''} 
+      className='btn-next'
+    >
+      Siguiente
+    </Link>
   
   </footer>
   

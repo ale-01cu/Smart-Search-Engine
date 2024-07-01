@@ -6,7 +6,7 @@ export const DetailCard = ({id, query}) => {
 
   useEffect(() => {
     getPub(id)
-      .then(data => {
+      .then(({data}) => {
         setDetail(data)
       })
     
