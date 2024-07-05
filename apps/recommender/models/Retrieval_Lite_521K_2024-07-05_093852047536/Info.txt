@@ -1,0 +1,33 @@
+Nombre: Retrieval Lite
+
+ ********** Hiperparametros **********
+Towers Layers Sizes: []
+Features Query: ['usuario_id']
+Features Candidate: ['id']
+Embedding Dimension: 64
+Shuffle: 100000
+Train Batch: 4096
+Test Batch: 1024
+Candidate Batch: 128
+K Candidates: 100
+Epochs: 30
+Learning Rate: 0.1
+
+ ********** train **********
+Top-1 accuracy (train): 0.09.
+Top-1 accuracy (train): 0.43.
+Top-1 accuracy (train): 0.59.
+Top-1 accuracy (train): 0.87.
+Top-1 accuracy (train): 0.94.
+
+ ********** test **********
+Top-1 accuracy (test): 0.05.
+Top-1 accuracy (test): 0.26.
+Top-1 accuracy (test): 0.37.
+Top-1 accuracy (test): 0.64.
+Top-1 accuracy (test): 0.73.
+
+ ********** Parametros **********
+embedding/embeddings:0: 353984
+embedding_1/embeddings:0: 166592
+Total params: 520576
